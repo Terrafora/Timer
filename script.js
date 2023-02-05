@@ -5,15 +5,17 @@ const pauseButton = document.getElementById("pomodoro-pause")
 const stopButton = document.getElementById("pomodoro-stop")
 
 let isClockRunning = false
+let type = "Work"
 
 // 25 minutes in seconds
 
 let workSessionDuration = 1500
 let currentTimeLeftInSession = 1500
+let timeSpentInCurrentSession = 0
 
 // 5 minutes in seconds
 
-let breakSessionSuration = 300
+let breakSessionDuration = 300
 
 //Start button functionality
 
@@ -77,7 +79,40 @@ const displayCurrentTimeLeftInSession = () => {
 const stopClock = () => {
     // Reset timer
     clearInterval(clockTimer)
+    timeSpentInCurrentSession = 0
     isClockRunning = false
     currentTimeLeftInSession = workSessionDuration
     displayCurrentTimeLeftInSession()
+}
+
+const stepDown = () => {
+    if(currentTimeLeftInSession > 0) {
+        currentTimeLeftInSession--
+        timeSpentInCurrentSession++
+    }
+    else if (currentTimeLeftInSession === 0) {
+        timeSpentInCurrentSession = 0
+        if(type === "Work"){
+            currentTimeLeftInSession = breakSessionDuration
+            displaySessionLog("Work")
+            type = "Break"
+        }
+        else {
+            currentTimeLeftInSession = workSessionDuration
+            type = "Work"
+            displaySessionLog("Break")
+        }
+    }
+    displayCurrentTimeLeftInSession()
+}
+
+const displaySessionLog = (type) => {
+    const sessionsList = document.getElementById("pomodoro-sessions")
+    const li = document.createElement("li")
+    let elapsedTime = parseInt(timeSpentInCurrentSession / 60)
+    elapsedTime = elapsedTime > 0 ? elapsedTime : "< 1"
+
+    const text = document.createTextNode(`${sesionLabel} : ${elapsedTime} min`)
+    li.appendChild(text)
+    sessionsList.appendChild(li)
 }
